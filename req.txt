@@ -1,2 +1,5 @@
 flask
+flask_sock
 cryptography
+uuid
+msgpack
