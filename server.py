@@ -198,15 +198,13 @@ def sync():
             "InvalidSaveSlotInfoList":   None,
             "InvalidClientHunterIdList": None,
 			"SaveSlotInfoList": [
-				{
-					"HunterInfo": {
-						"HunterId":   hunterId,
-						"HunterName": savelist[0]["HunterName"],
-						"OtomoName":  savelist[0]["OtomoName"],
-						"SaveSlot":   0,
-					},
-					"ShortId": "1A2B3C4D",
-				},
+                {
+                    "HunterId":   hunterId,
+                    "HunterName": savelist[0]["HunterName"],
+                    "OtomoName":  savelist[0]["OtomoName"],
+                    "SaveSlot":   0
+                },
+                {"ShortId": "1A2B3C4D"}
 			]
         }
     )
