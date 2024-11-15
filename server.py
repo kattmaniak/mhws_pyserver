@@ -1,6 +1,13 @@
 from flask import Flask, Response, json, redirect, request
 from simple_websocket import Server, ConnectionClosed
 import time, uuid, msgpack, base64
+
+
+def nonce() -> str:
+    nonce = uuid.uuid4().hex
+    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
+    return nonce
+
 class Room:
   def __init__(self, room_id):
     self.room = room_id
@@ -14,8 +21,7 @@ class Room:
 room_dict = {}
 
 hunterId = ""
-userId = uuid.uuid4().hex
-userId = userId[:8] + "-" + userId[8:12] + "-" + userId[12:16] + "-" + userId[16:20] + "-" + userId[20:]
+userId = nonce()
 
 app = Flask(__name__)
 
@@ -140,29 +146,23 @@ def token():
 @app.route("/auth/login", methods=["POST"])
 def login():
     resp = Response()
-    session = uuid.uuid4().hex
-    session = session[:8] + "-" + session[8:12] + "-" + session[12:16] + "-" + session[16:20] + "-" + session[20:]
+    session = nonce()
     data = {
         "SessionId":        session,
         "UserId":           userId,
         "IsInCommunityBan": False,
     }
     resp.data = msgpack.packb(data)
-    nonce = uuid.uuid4().hex
-    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
-    resp.headers["x-session-nonce"] = nonce
+    resp.headers["x-session-nonce"] = nonce()
     resp.content_type = "application/octet-stream"
     return resp
 
 @app.route("/auth/ticket", methods=["POST"])
 def ticket():
     resp = Response()
-    ticket = uuid.uuid4().hex
-    ticketf = ticket[:8] + "-" + ticket[8:12] + "-" + ticket[12:16] + "-" + ticket[16:20] + "-" + ticket[20:]
+    ticketf = nonce()
     resp.data = bytes("\x81\xa6" + "Ticket" + "\xd9\x24" + ticketf, encoding="latin-1")
-    nonce = uuid.uuid4().hex
-    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
-    resp.headers["x-session-nonce"] = nonce
+    resp.headers["x-session-nonce"] = nonce()
     resp.content_type = "application/octet-stream"
     return resp
 
@@ -173,9 +173,7 @@ def delivery_data():
     resp = Response()
     file = open("json/delivery_data_get.bin", "rb")
     resp.data = file.read()
-    nonce = uuid.uuid4().hex
-    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
-    resp.headers["x-session-nonce"] = nonce
+    resp.headers["x-session-nonce"] = nonce()
     resp.content_type = "application/octet-stream"
     return resp
 
@@ -189,8 +187,7 @@ def sync():
     print(savelist)
     hid = savelist[0]["HunterId"]
     if str(hid) == "":
-        hid = uuid.uuid4().hex
-        hid = hid[:8] + "-" + hid[8:12] + "-" + hid[12:16] + "-" + hid[16:20] + "-" + hid[20:]
+        hid = nonce()
     hunterId = str(hid)
     resp = Response()
     resp.data = msgpack.packb(
@@ -208,9 +205,7 @@ def sync():
 			]
         }
     )
-    nonce = uuid.uuid4().hex
-    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
-    resp.headers["x-session-nonce"] = [nonce]
+    resp.headers["x-session-nonce"] = [nonce()]
     resp.content_type = "application/octet-stream"
     return resp
 
@@ -231,9 +226,7 @@ def upload():
             ],
 		}
     )
-    nonce = uuid.uuid4().hex
-    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
-    resp.headers["x-session-nonce"] = nonce
+    resp.headers["x-session-nonce"] = nonce()
     resp.content_type = "application/octet-stream"
     return resp
 
@@ -254,9 +247,7 @@ def update():
 			],
 		}
     )
-    nonce = uuid.uuid4().hex
-    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
-    resp.headers["x-session-nonce"] = nonce
+    resp.headers["x-session-nonce"] = nonce()
     resp.content_type = "application/octet-stream"
     return resp
 
@@ -266,9 +257,7 @@ def rank():
     }
     resp = Response()
     resp.data = msgpack.packb(data)
-    nonce = uuid.uuid4().hex
-    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
-    resp.headers["x-session-nonce"] = nonce
+    resp.headers["x-session-nonce"] = nonce()
     resp.content_type = "application/octet-stream"
     return resp
 
@@ -277,9 +266,7 @@ def play():
     data = b"\x80"
     resp = Response()
     resp.data = data
-    nonce = uuid.uuid4().hex
-    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
-    resp.headers["x-session-nonce"] = nonce
+    resp.headers["x-session-nonce"] = nonce()
     resp.content_type = "application/octet-stream"
     return resp
 
@@ -308,9 +295,7 @@ def total_list():
 			"LastOperationId": "",
 		}
     )
-    nonce = uuid.uuid4().hex
-    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
-    resp.headers["x-session-nonce"] = nonce
+    resp.headers["x-session-nonce"] = nonce()
     resp.content_type = "application/octet-stream"
     return resp
 
@@ -322,9 +307,7 @@ def notification_list():
 			"List": []
 		}
     )
-    nonce = uuid.uuid4().hex
-    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
-    resp.headers["x-session-nonce"] = nonce
+    resp.headers["x-session-nonce"] = nonce()
     resp.content_type = "application/octet-stream"
     return resp
 
@@ -336,9 +319,7 @@ def received_list():
 			"List": []
 		}
     )
-    nonce = uuid.uuid4().hex
-    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
-    resp.headers["x-session-nonce"] = nonce
+    resp.headers["x-session-nonce"] = nonce()
     resp.content_type = "application/octet-stream"
     return resp
 
@@ -352,9 +333,7 @@ def block_list():
 			"OperationId":   0,
 		}
     )
-    nonce = uuid.uuid4().hex
-    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
-    resp.headers["x-session-nonce"] = nonce
+    resp.headers["x-session-nonce"] = nonce()
     resp.content_type = "application/octet-stream"
     return resp
 
@@ -366,9 +345,7 @@ def friend_list():
 			"FriendList": []
 		}
     )
-    nonce = uuid.uuid4().hex
-    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
-    resp.headers["x-session-nonce"] = nonce
+    resp.headers["x-session-nonce"] = nonce()
     resp.content_type = "application/octet-stream"
     return resp
 
@@ -380,9 +357,7 @@ def auto_join():
             "Endpoints": ["hjm.rebe.capcom.com:443"]
         }
     )
-    nonce = uuid.uuid4().hex
-    nonce = nonce[:8] + "-" + nonce[8:12] + "-" + nonce[12:16] + "-" + nonce[16:20] + "-" + nonce[20:]
-    resp.headers["x-session-nonce"] = nonce
+    resp.headers["x-session-nonce"] = nonce()
     resp.content_type = "application/octet-stream"
     return resp
 
