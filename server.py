@@ -45,8 +45,8 @@ def system():
                                     },
                                 "qa3" :
                                     {
-                                        "api":    "https://" + host,
-                                        "notify": "wss://" + host,
+                                        "api":    "https://hjm.rebe.capcom.com",
+                                        "notify": "wss://hjm.rebe.capcom.com",
                                     }
                             }
                         ), "utf-8"
@@ -55,13 +55,13 @@ def system():
             ,
 			"json_ver":      "1.0.2",
 			"mmr":          "https://mmr.rebe.capcom.com",
-			"mtm":          "https://" + host,
+			"mtm":          "https://hjm.rebe.capcom.com",
 			"mtms":         "https://mtms.rebe.capcom.com",
 			"nkm":          "https://nkm.rebe.capcom.com",
 			"revision":     "00001",
 			"selector":     "https://selector.gs.capcom.com",
 			"title":        "EAR-B-WW",
-			"tmr":          "https://" + host + "/v1/projects/earth-analysis-obt/topics/analysis-client-log:publish",
+			"tmr":          "https://hjm.rebe.capcom.com/v1/projects/earth-analysis-obt/topics/analysis-client-log:publish",
 			"wlt":          "https://wlt.rebe.capcom.com",
 			"working_state": "alive",
 		}
@@ -188,10 +188,10 @@ def sync():
     savelist = bdata["HunterSaveList"]
     print(savelist)
     hid = savelist[0]["HunterId"]
-    if hid == b"":
+    if str(hid) == "":
         hid = uuid.uuid4().hex
-        hid = hunterId[:8] + "-" + hunterId[8:12] + "-" + hunterId[12:16] + "-" + hunterId[16:20] + "-" + hunterId[20:]
-    hunterId = hid
+        hid = hid[:8] + "-" + hid[8:12] + "-" + hid[12:16] + "-" + hid[16:20] + "-" + hid[20:]
+    hunterId = str(hid)
     resp = Response()
     resp.data = msgpack.packb(
         {
